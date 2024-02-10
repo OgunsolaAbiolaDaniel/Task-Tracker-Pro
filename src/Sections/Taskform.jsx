@@ -4,7 +4,7 @@ import { FaPlus } from "react-icons/fa6";
 import { useState,useContext } from 'react';
 import { MdAssignmentAdd } from "react-icons/md";
 import Card from './card';
-import Subtaskbox, { Textinput } from './subtaskbox';
+import Subtaskbox from './subtaskbox';
 
 const Taskform = ({ handleClose }) => {
   const [task,setTask]= useState([])
@@ -47,7 +47,7 @@ const Taskform = ({ handleClose }) => {
    function handleInputSubtasks() {
      const newSubTask = {
        id: subTasks.length + 1,
-       text: Textinput,
+       text: '',
      };
     
      setSubTasks((sbt) => [newSubTask]);
