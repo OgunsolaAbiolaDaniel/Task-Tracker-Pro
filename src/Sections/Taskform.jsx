@@ -1,68 +1,83 @@
-import React from 'react'
+import React from "react";
 import { IoClose } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa6";
-import { useState,useContext } from 'react';
+import { useState } from "react";
 import { MdAssignmentAdd } from "react-icons/md";
-import Card from './card';
-import Subtaskbox from './subtaskbox';
+import SubtaskInput from "./SubtaskInput";
+import { useStoreContext } from "./../context/store-context";
+import { v4 as uuidv4 } from "uuid";
 
 const Taskform = ({ handleClose }) => {
-  const [task,setTask]= useState([])
-  const [title, setTitle] = useState("")
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [subTasks, setSubTasks] = useState([])
-  const [status, setStatus] = useState("Todo");
+  const [subTasks, setSubTasks] = useState([]);
+  const [status, setStatus] = useState("");
 
-  //task add 
+  const [store, setStore] = useStoreContext();
+
+  //task add
   function handleAddTask() {
     const newTask = {
+      id: uuidv4(),
       title: title,
       description: description,
-      subtasks: subTasks,
+      subTasks: subTasks,
       status: status,
     };
-    setTask((ta) => [newTask]);
+    console.log(newTask);
+    addTaskToStore(newTask.status, newTask);
     //to reset the form
     setTitle("");
     setDescription("");
     setSubTasks([]);
     setStatus("");
-    return (
-      <Card title={task[index].title} subTasks={task[index].subTasks}></Card>
+    handleClose();
+  }
+
+  // Add a new task to a specific task store
+  function addTaskToStore(statusId, newTask) {
+    console.log("statusId, newTask", statusId, newTask);
+    setStore((v) =>
+      v.map((store) => {
+        if (store.id === statusId) {
+          return {
+            ...store,
+            tasks: [
+              ...store.tasks,
+              {
+                title: newTask.title,
+                description: newTask.description,
+                statusId,
+                id: uuidv4(),
+                subTasks: newTask.subTasks.map((l) => ({
+                  id: uuidv4(),
+                  label: l,
+                  done: false,
+                })),
+              },
+            ],
+          };
+        }
+        return store;
+      })
     );
   }
-  //title add
-   function handleInputTitle(event) {
-     setTitle(event.target.value);
-  }
-  //description add
-  function handleInputDescription(event) {
-  setDescription(event.target.value);
-  }
-  //add subtask creation btn
-  function createSubtasksInputField() {
-   return <Subtaskbox  />;
-   }
-  //subtask input
-   function handleInputSubtasks() {
-     const newSubTask = {
-       id: subTasks.length + 1,
-       text: '',
-     };
-    
-     setSubTasks((sbt) => [newSubTask]);
-  }
-  //subtask handleAddSubtask-text- input field 
-  function handleAddSubTaskText(event) {
-    setText(event.target.value)
-  }
-  //Status Field
-    function handleInputStatus(event) {
-      setStatus(event.target.value);
-    }
-  /*const [subtaskInputFields,setSubTaskInputFields] = useState([])*/
-  //btn onclick createTask function ()=>{const newTasks= <Card id={index} title={task} descrption={description} subtask={subtasks.length} status={status} ></Card> return newTasks}
-  
+
+  const addSubtask = () => {
+    setSubTasks((v) => [...v, ""]); // Add an empty subtask
+  };
+
+  const updateSubtask = (index, value) => {
+    const updatedSubtasks = [...subTasks];
+    updatedSubtasks[index] = value;
+    setSubTasks(updatedSubtasks);
+  };
+
+  const removeSubtask = (index) => {
+    const updatedSubtasks = [...subTasks];
+    updatedSubtasks.splice(index, 1);
+    setSubTasks(updatedSubtasks);
+  };
 
   return (
     <div className="p-6 font-mono text-base  bg-gray-50 absolute top- left-[33%]  z-10 shadow-[0_35px_60px_5000px_rgba(0,0,0,0.3)] size-fit rounded-md ">
@@ -83,7 +98,8 @@ const Taskform = ({ handleClose }) => {
           <input
             type="text"
             name="title"
-            onChange={handleInputTitle}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="border-solid font-mono border border-inherit w-[100%] h-9 rounded-lg px-2 "
             placeholder="e.g Make some delicious noodles"
           />
@@ -95,6 +111,8 @@ const Taskform = ({ handleClose }) => {
             rows="4"
             className="border-solid border-inherit w-[100%] rounded-lg py-1 px-2"
             placeholder="e.g its always good to take a break.This 15 minutes break will reacharge the batteries a little"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           ></textarea>
         </div>
         <div className="flex-col justify-start">
@@ -102,29 +120,38 @@ const Taskform = ({ handleClose }) => {
             <div className="text-lg">Subtasks</div>
             <button
               className="flex-row bg-slate-100 border rounded-sm p-[0.5]"
-              onClick={proadd}
+              onClick={addSubtask}
             >
-          
               <FaPlus />
             </button>
           </div>
-         // <ul>{add ? <li className='list-none'> </li> : null}</ul>
+          {/* <ul>{add ? <li className="list-none"> </li> : null}</ul> */}
+          {subTasks.map((subtask, index) => (
+            <SubtaskInput
+              key={index}
+              index={index}
+              value={subtask}
+              onChange={updateSubtask}
+              onRemove={removeSubtask}
+            />
+          ))}
         </div>
 
         <select
           name=""
           id=""
           className="w-[100%] py-[0.5rem] border rounded-lg mt-4 px-2 border-slate-500 text-blue-500 font-mono cursor-pointer"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
         >
-          <option value="" className="bg-blue-300" id="todo">
-            Todo
+          <option value="" className="bg-blue-300" id="">
+            Select status
           </option>
-          <option value="" className="bg-blue-300" id="doing">
-            Doing
-          </option>
-          <option value="" className="bg-blue-300" id="done">
-            Done
-          </option>
+          {store.map((v) => (
+            <option key={v.id} value={v.id} className="bg-blue-300" id={v.id}>
+              {v.label}
+            </option>
+          ))}
         </select>
         <button
           onClick={handleAddTask}
@@ -138,4 +165,4 @@ const Taskform = ({ handleClose }) => {
   );
 };
 
-export default Taskform 
+export default Taskform;
