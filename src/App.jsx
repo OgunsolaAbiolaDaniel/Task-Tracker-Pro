@@ -3,7 +3,7 @@ import Nav from "./components/Nav"
 import {StoreContext} from './context/store-context'
 function App() {
   return (
-    <StoreContext.Provider>
+    <StoreContext.Provider value={[]}>
       <Nav />
       <Body />
     </StoreContext.Provider>

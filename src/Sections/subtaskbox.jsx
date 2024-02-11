@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react'
 import { IoClose } from 'react-icons/io5';
+export const Textinput = createContext(text);
 
 function Subtaskbox() {
     const [text, setText] = useState("")
