@@ -1,12 +1,15 @@
 import Body from "./Sections/Body";
-import Nav from "./components/Nav"
-import {StoreContext} from './context/store-context'
+import Nav from "./components/Nav";
+import StoreContextProvider from './context/store-context'
+
+
+
 function App() {
   return (
-    <StoreContext.Provider value={[]}>
+    <StoreContextProvider>
       <Nav />
       <Body />
-    </StoreContext.Provider>
+    </StoreContextProvider>
   );
 }
-export default App
+export default App;
